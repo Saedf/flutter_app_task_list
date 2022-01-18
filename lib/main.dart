@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -23,6 +24,54 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+      ),
+      home: const HomeScree(),
+    );
+  }
+}
+
+class HomeScree extends StatelessWidget {
+  const HomeScree({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('To Do List'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => EditTaskScreen(),
+            ));
+          },
+          label: Text('Add New Task')),
+      body: Container(),
+    );
+  }
+}
+
+class EditTaskScreen extends StatelessWidget {
+  final TextEditingController _controller = TextEditingController();
+  EditTaskScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Task...'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {}, label: const Text('Save')),
+      body: Column(
+        children: [
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(label: Text('Add a task for today...')),
+          )
+        ],
       ),
     );
   }
