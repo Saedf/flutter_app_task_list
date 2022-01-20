@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_task_list/data.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
+const taskBoxName = 'TaskBox';
 void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(PriorityAdapter());
+  await Hive.openBox<Task>(taskBoxName);
   runApp(const MyApp());
 }
 
@@ -35,6 +42,7 @@ class HomeScree extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final box = Hive.box<Task>(taskBoxName);
     return Scaffold(
       appBar: AppBar(
         title: Text('To Do List'),
@@ -47,7 +55,25 @@ class HomeScree extends StatelessWidget {
             ));
           },
           label: Text('Add New Task')),
-      body: Container(),
+      body: ValueListenableBuilder<Box<Task>>(
+        valueListenable: box.listenable(),
+        builder: (context, box, child) {
+          return ListView.builder(
+              itemCount: box.values.length,
+              itemBuilder: (context, index) {
+                final Task task = box.values.toList()[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    child: Text(
+                      task.name,
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                );
+              });
+        },
+      ),
     );
   }
 }
@@ -64,14 +90,30 @@ class EditTaskScreen extends StatelessWidget {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {}, label: const Text('Save')),
-      body: Column(
-        children: [
-          TextField(
-            controller: _controller,
-            decoration: InputDecoration(label: Text('Add a task for today...')),
-          )
-        ],
+          onPressed: () {
+            final task = Task();
+            task.name = _controller.text;
+            task.priority = Priority.normal;
+            if (task.isInBox) {
+              task.save();
+            } else {
+              final Box<Task> box = Hive.box(taskBoxName);
+              box.add(task);
+            }
+            Navigator.of(context).pop();
+          },
+          label: const Text('Save')),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration:
+                  InputDecoration(label: Text('Add a task for today...')),
+            )
+          ],
+        ),
       ),
     );
   }
