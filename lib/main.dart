@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_task_list/data.dart';
+import 'package:flutter_app_task_list/edit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -83,7 +84,9 @@ class HomeScree extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => EditTaskScreen(),
+              builder: (context) => EditTaskScreen(
+                task: TaskEntity(),
+              ),
             ));
           },
           label: Row(
@@ -301,47 +304,6 @@ class MyCheckBox extends StatelessWidget {
               size: 14,
             )
           : null,
-    );
-  }
-}
-
-class EditTaskScreen extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
-  EditTaskScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Task...'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            final task = TaskEntity();
-            task.name = _controller.text;
-            task.priority = Priority.normal;
-            if (task.isInBox) {
-              task.save();
-            } else {
-              final Box<TaskEntity> box = Hive.box(taskBoxName);
-              box.add(task);
-            }
-            Navigator.of(context).pop();
-          },
-          label: const Text('Save')),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              decoration:
-                  InputDecoration(label: Text('Add a task for today...')),
-            )
-          ],
-        ),
-      ),
     );
   }
 }
