@@ -225,7 +225,7 @@ class HomeScree extends StatelessWidget {
 }
 
 class taskItem extends StatefulWidget {
-  static const double height = 84;
+  static const double height = 74;
   static const double borderRadius = 8;
   const taskItem({
     Key? key,
@@ -260,9 +260,14 @@ class _taskItemState extends State<taskItem> {
     }
     return InkWell(
       onTap: () {
-        setState(() {
-          widget.task.isCompleted = !widget.task.isCompleted;
-        });
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EditTaskScreen(task: widget.task),
+          ),
+        );
+        // setState(() {
+        //   widget.task.isCompleted = !widget.task.isCompleted;
+        // });
       },
       child: Container(
         margin: const EdgeInsets.only(top: 8),
@@ -280,7 +285,13 @@ class _taskItemState extends State<taskItem> {
         ),
         child: Row(
           children: [
-            MyCheckBox(value: widget.task.isCompleted),
+            MyCheckBox(
+                value: widget.task.isCompleted,
+                onTap: () {
+                  setState(() {
+                    widget.task.isCompleted = !widget.task.isCompleted;
+                  });
+                }),
             SizedBox(
               width: 16,
             ),
@@ -290,7 +301,6 @@ class _taskItemState extends State<taskItem> {
                 maxLines: 1,
                 overflow: TextOverflow.fade,
                 style: TextStyle(
-                    fontSize: 24,
                     decoration: widget.task.isCompleted
                         ? TextDecoration.lineThrough
                         : null),
@@ -319,26 +329,31 @@ class _taskItemState extends State<taskItem> {
 
 class MyCheckBox extends StatelessWidget {
   final bool value;
-  const MyCheckBox({Key? key, required this.value}) : super(key: key);
+  final Function() onTap;
+  const MyCheckBox({Key? key, required this.value, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border:
-              !value ? Border.all(color: secondaryTextColor, width: 2) : null,
-          color: value ? primaryColor : null),
-      child: value
-          ? Icon(
-              CupertinoIcons.check_mark,
-              color: themeData.colorScheme.onPrimary,
-              size: 14,
-            )
-          : null,
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border:
+                !value ? Border.all(color: secondaryTextColor, width: 2) : null,
+            color: value ? primaryColor : null),
+        child: value
+            ? Icon(
+                CupertinoIcons.check_mark,
+                color: themeData.colorScheme.onPrimary,
+                size: 14,
+              )
+            : null,
+      ),
     );
   }
 }
