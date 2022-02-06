@@ -33,7 +33,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
           onPressed: () {
             final task = TaskEntity();
             task.name = _controller.text;
-            task.priority = Priority.normal;
+            task.priority = widget.task.priority;
             if (task.isInBox) {
               task.save();
             } else {
@@ -70,7 +70,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         });
                       },
                       label: 'High',
-                      color: primaryColor,
+                      color: highPriority,
                       isSelected: widget.task.priority == Priority.high,
                     )),
                 const SizedBox(
@@ -85,7 +85,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         });
                       },
                       label: 'Normal',
-                      color: Color(0xffF09819),
+                      color: normalPriority,
                       isSelected: widget.task.priority == Priority.normal,
                     )),
                 const SizedBox(
@@ -100,7 +100,7 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                         });
                       },
                       label: 'Low',
-                      color: Color(0xff3BE1F1),
+                      color: lowPriority,
                       isSelected: widget.task.priority == Priority.low,
                     )),
               ],
