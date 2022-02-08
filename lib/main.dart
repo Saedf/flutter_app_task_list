@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_task_list/data.dart';
 import 'package:flutter_app_task_list/edit.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -163,63 +164,91 @@ class HomeScree extends StatelessWidget {
               child: ValueListenableBuilder<Box<TaskEntity>>(
                 valueListenable: box.listenable(),
                 builder: (context, box, child) {
-                  return ListView.builder(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: box.values.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Today',
-                                      style: themeData.textTheme.headline6!
-                                          .apply(fontSizeFactor: 0.8)),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 4),
-                                    width: 70,
-                                    height: 3,
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      borderRadius: BorderRadius.circular(1.5),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              MaterialButton(
-                                color: const Color(0xffEAEFF5),
-                                textColor: secondaryTextColor,
-                                elevation: 0,
-                                onPressed: () {},
-                                child: Row(
-                                  children: const [
-                                    Text('Delete All'),
-                                    SizedBox(
-                                      width: 4,
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.delete_solid,
-                                      size: 16,
+                  if (box.isNotEmpty) {
+                    return ListView.builder(
+                        padding: EdgeInsets.fromLTRB(16, 16, 16, 100),
+                        itemCount: box.values.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Today',
+                                        style: themeData.textTheme.headline6!
+                                            .apply(fontSizeFactor: 0.8)),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 4),
+                                      width: 70,
+                                      height: 3,
+                                      decoration: BoxDecoration(
+                                        color: primaryColor,
+                                        borderRadius:
+                                            BorderRadius.circular(1.5),
+                                      ),
                                     )
                                   ],
                                 ),
-                              ),
-                            ],
-                          );
-                        } else {
-                          final TaskEntity task =
-                              box.values.toList()[index - 1];
-                          return taskItem(task: task);
-                        }
-                      });
+                                MaterialButton(
+                                  color: const Color(0xffEAEFF5),
+                                  textColor: secondaryTextColor,
+                                  elevation: 0,
+                                  onPressed: () {
+                                    box.clear();
+                                  },
+                                  child: Row(
+                                    children: const [
+                                      Text('Delete All'),
+                                      SizedBox(
+                                        width: 4,
+                                      ),
+                                      Icon(
+                                        CupertinoIcons.delete_solid,
+                                        size: 16,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            final TaskEntity task =
+                                box.values.toList()[index - 1];
+                            return taskItem(task: task);
+                          }
+                        });
+                  } else {
+                    return const EmptyState();
+                  }
                 },
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  const EmptyState({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SvgPicture.asset(
+          'assets/empty_state.svg',
+          width: 120,
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        const Text('Your Task List is empty! '),
+      ],
     );
   }
 }
@@ -268,6 +297,9 @@ class _taskItemState extends State<taskItem> {
         // setState(() {
         //   widget.task.isCompleted = !widget.task.isCompleted;
         // });
+      },
+      onLongPress: () {
+        widget.task.delete();
       },
       child: Container(
         margin: const EdgeInsets.only(top: 8),
