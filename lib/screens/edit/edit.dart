@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_app_task_list/data.dart';
+import 'package:flutter_app_task_list/data/data.dart';
+
 import 'package:flutter_app_task_list/main.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
