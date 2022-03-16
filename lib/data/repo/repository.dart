@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_app_task_list/data/source/source.dart';
 
-class Repository<T> implements DataSource<T> {
+class Repository<T> extends ChangeNotifier implements DataSource<T> {
   final DataSource<T> localdatasource;
   //final DataSource<T> remoteDatasource;
 
@@ -8,27 +9,32 @@ class Repository<T> implements DataSource<T> {
     this.localdatasource,
   );
   @override
-  Future<T> createOrUpdate(T data) {
+  Future<T> createOrUpdate(T data) async {
     // TODO: implement createOrUpdate
-    return localdatasource.createOrUpdate(data);
+    final T result = await localdatasource.createOrUpdate(data);
+    notifyListeners();
+    return result;
   }
 
   @override
-  Future<void> delete(T data) {
+  Future<void> delete(T data) async {
     // TODO: implement delete
-    return localdatasource.delete(data);
+    await localdatasource.delete(data);
+    notifyListeners();
   }
 
   @override
-  Future<void> deleteAll() {
+  Future<void> deleteAll() async {
     // TODO: implement deleteAll
-    return localdatasource.deleteAll();
+    await localdatasource.deleteAll();
+    notifyListeners();
   }
 
   @override
-  Future<void> deleteById(id) {
+  Future<void> deleteById(id) async {
     // TODO: implement deleteById
-    return deleteById(id);
+    await deleteById(id);
+    notifyListeners();
   }
 
   @override

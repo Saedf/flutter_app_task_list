@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app_task_list/data/repo/repository.dart';
+import 'package:flutter_app_task_list/data/source/hive_task_source.dart';
 import 'package:flutter_app_task_list/screens/home/home.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 import 'data/data.dart';
 
 const taskBoxName = 'TaskBox';
 void main() async {
+  // final Repository<TaskEntity> repository =
+  //     Repository(HiveTaskDataSource(Hive.box(taskBoxName)));
   await Hive.initFlutter();
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(PriorityAdapter());
@@ -16,7 +21,10 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(statusBarColor: primaryVariantColor),
   );
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider<Repository<TaskEntity>>(
+      create: (context) =>
+          Repository<TaskEntity>(HiveTaskDataSource(Hive.box(taskBoxName))),
+      child: const MyApp()));
 }
 
 const Color primaryColor = Color(0xff794cff);
@@ -71,7 +79,7 @@ class MyApp extends StatelessWidget {
           onSecondary: Colors.white,
         ),
       ),
-      home: HomeScree(),
+      home: HomeScreen(),
     );
   }
 }
