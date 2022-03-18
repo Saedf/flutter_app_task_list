@@ -5,20 +5,29 @@ import 'package:flutter_app_task_list/data/data.dart';
 import 'package:flutter_app_task_list/data/repo/repository.dart';
 
 import 'package:flutter_app_task_list/main.dart';
+import 'package:flutter_app_task_list/screens/edit/cubit/edittask_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 class EditTaskScreen extends StatefulWidget {
-  final TaskEntity task;
-  EditTaskScreen({Key? key, required this.task}) : super(key: key);
+  EditTaskScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<EditTaskScreen> createState() => _EditTaskScreenState();
 }
 
 class _EditTaskScreenState extends State<EditTaskScreen> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.task.name);
+  late final TextEditingController _controller;
+  @override
+  void initState() {
+    _controller = TextEditingController(
+        text: context.read<EdittaskCubit>().state.task.name);
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,19 +44,8 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            // final task = TaskEntity();
+            context.read<EdittaskCubit>().onSaveChagesClick();
 
-            widget.task.name = _controller.text;
-            widget.task.priority = widget.task.priority;
-            final repository =
-                Provider.of<Repository<TaskEntity>>(context, listen: false);
-            repository.createOrUpdate(widget.task);
-            // if (widget.task.isInBox) {
-            // widget.task.save();
-            // } else {
-            // final Box<TaskEntity> box = Hive.box(taskBoxName);
-            // box.add(widget.task);
-            // }
             Navigator.of(context).pop();
           },
           label: Row(
@@ -66,55 +64,67 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Flex(
-              direction: Axis.horizontal,
-              children: [
-                Flexible(
-                    flex: 1,
-                    child: PriorityCheckBox(
-                      onTap: () {
-                        setState(() {
-                          widget.task.priority = Priority.high;
-                        });
-                      },
-                      label: 'High',
-                      color: highPriority,
-                      isSelected: widget.task.priority == Priority.high,
-                    )),
-                const SizedBox(
-                  width: 8,
-                ),
-                Flexible(
-                    flex: 1,
-                    child: PriorityCheckBox(
-                      onTap: () {
-                        setState(() {
-                          widget.task.priority = Priority.normal;
-                        });
-                      },
-                      label: 'Normal',
-                      color: normalPriority,
-                      isSelected: widget.task.priority == Priority.normal,
-                    )),
-                const SizedBox(
-                  width: 8,
-                ),
-                Flexible(
-                    flex: 1,
-                    child: PriorityCheckBox(
-                      onTap: () {
-                        setState(() {
-                          widget.task.priority = Priority.low;
-                        });
-                      },
-                      label: 'Low',
-                      color: lowPriority,
-                      isSelected: widget.task.priority == Priority.low,
-                    )),
-              ],
+            BlocBuilder<EdittaskCubit, EdittaskState>(
+              builder: (context, state) {
+                final priority = state.task.priority;
+                return Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    Flexible(
+                        flex: 1,
+                        child: PriorityCheckBox(
+                          onTap: () {
+                            context
+                                .read<EdittaskCubit>()
+                                .onPriorityChange(Priority.high);
+                          },
+                          label: 'High',
+                          color: highPriority,
+                          isSelected: priority == Priority.high,
+                        )),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Flexible(
+                        flex: 1,
+                        child: PriorityCheckBox(
+                          onTap: () {
+                            setState(() {
+                              context
+                                  .read<EdittaskCubit>()
+                                  .onPriorityChange(Priority.normal);
+                            });
+                          },
+                          label: 'Normal',
+                          color: normalPriority,
+                          isSelected: priority == Priority.normal,
+                        )),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    Flexible(
+                        flex: 1,
+                        child: PriorityCheckBox(
+                          onTap: () {
+                            setState(() {
+                              context
+                                  .read<EdittaskCubit>()
+                                  .onPriorityChange(Priority.low);
+                            });
+                          },
+                          label: 'Low',
+                          color: lowPriority,
+                          isSelected: priority == Priority.low,
+                        )),
+                  ],
+                );
+              },
             ),
             TextField(
               controller: _controller,
+              onChanged: (value) {
+                context.read<EdittaskCubit>().onTextChanged(value);
+              },
               decoration: InputDecoration(
                   label: Text(
                 '',

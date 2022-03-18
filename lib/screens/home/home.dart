@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_task_list/data/data.dart';
 import 'package:flutter_app_task_list/data/repo/repository.dart';
 import 'package:flutter_app_task_list/main.dart';
+import 'package:flutter_app_task_list/screens/edit/cubit/edittask_cubit.dart';
 import 'package:flutter_app_task_list/screens/edit/edit.dart';
 import 'package:flutter_app_task_list/screens/home/bloc/tasklist_bloc.dart';
 import 'package:flutter_app_task_list/widgets.dart';
@@ -24,8 +25,10 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => EditTaskScreen(
-                task: TaskEntity(),
+              builder: (context) => BlocProvider<EdittaskCubit>(
+                create: (context) => EdittaskCubit(
+                    TaskEntity(), context.read<Repository<TaskEntity>>()),
+                child: EditTaskScreen(),
               ),
             ));
           },
@@ -292,7 +295,11 @@ class _taskItemState extends State<taskItem> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => EditTaskScreen(task: widget.task),
+            builder: (context) => BlocProvider<EdittaskCubit>(
+              create: (context) => EdittaskCubit(
+                  widget.task, context.read<Repository<TaskEntity>>()),
+              child: EditTaskScreen(),
+            ),
           ),
         );
         // setState(() {
